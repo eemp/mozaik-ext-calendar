@@ -1,18 +1,14 @@
 .calendar {
   padding: 2vmin;
 }
-
 .calendar__title {
   margin-top: 1vh;
 }
-
 .calendar__list {
   list-style: none;
   padding-left: 0;
   margin: 0;
 }
-
 .calendar__list-item--title {
   padding-right: 2vw;
 }
-

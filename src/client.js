@@ -1,30 +1,24 @@
-import fs from 'fs';
-import path from 'path';
-import Promise from 'bluebird';
-import config from './config';
-import Almanac from './almanac';
+const fs = require('fs');
+const path = require('path');
+const Promise = require('bluebird');
+const config = require('./config');
+const Almanac = require('./almanac');
 
 const client = mozaik => {
 
   mozaik.loadApiConfig(config);
-  var keyPath = path.normalize(config.get('calendar.googleServiceKeypath'));
 
-  // Seems absolute/relative?
-  if (keyPath.substr(0, 1) !== '/') {
-    keyPath = path.join(process.cwd(), keyPath);
-  }
-
-  if (!fs.existsSync(keyPath)) {
-    mozaik.logger.error('Failed to find calendar .PEM file: %s -- ignoring API', keyPath);
+  const configPath = config.get('calendar.googleServiceKeypath');
+  const keyPath = configPath && path.resolve(path.normalize(configPath));
+  const key = keyPath && require(keyPath);
+  if (!key) {
+    mozaik.logger.error('Failed to find calendar API JSON key file: %s -- ignoring API', keyPath);
     return {};
   }
 
-  var almanac = new Almanac({
-    serviceEmail: config.get('calendar.googleServiceEmail'),
-    serviceKey: fs.readFileSync(keyPath).toString()
-  });
+  const almanac = new Almanac(key);
 
-  const apiCalls = {
+  return {
     events: (params) => {
 
       return almanac.authorize()
@@ -42,7 +36,6 @@ const client = mozaik => {
     }
   };
 
-  return apiCalls;
 };
 
-export default client;
+module.exports = client;

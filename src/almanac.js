@@ -1,7 +1,9 @@
-import Promise from 'bluebird';
-import googleapis from 'googleapis';
-import _ from 'lodash';
-import moment from 'moment';
+const _ = require('lodash');
+const moment = require('moment');
+const Promise = require('bluebird');
+
+const {google} = require('googleapis');
+const calendar = google.calendar;
 
 /**
  * Almanac class for communicating with Analytics via googleapis
@@ -9,25 +11,24 @@ import moment from 'moment';
  */
 class Almanac {
 
-  constructor(opts) {
-    // Log the authentication
-    const keyHeader = '-----BEGIN RSA PRIVATE KEY-----';
-    const keyIdentifier = opts.serviceKey.substr(opts.serviceKey.indexOf(keyHeader) + keyHeader.length, 10);
-    console.log('Authenticating calendar with', opts.serviceEmail, '/', keyIdentifier.replace(/\n/g, ''), '...');
-
-    this.gapi = googleapis.calendar('v3');
-    this.jwtClient = new googleapis.auth.JWT(
-      opts.serviceEmail, null, opts.serviceKey, [
+  constructor(jsonKey) {
+    const auth = this.jwtClient = new google.auth.JWT(
+      jsonKey.client_email,
+      null,
+      jsonKey.private_key,
+      [
         'https://www.googleapis.com/auth/calendar.readonly'
-      ]
+      ],
+      null
     );
+    this.gapi = google.calendar({version: 'v3', auth});
   }
 
   authorize() {
     return new Promise((resolve, reject) => {
       this.jwtClient.authorize((err, tokens) =>{
         if (err) {
-          console.warn('Failed to authenticate');
+          console.warn('Failed to authenticate', err);
           return reject(err);
         }
         return resolve({ client: this.jwtClient, tokens: tokens });
@@ -54,10 +55,10 @@ class Almanac {
 
       self.gapi.events.list({
         calendarId: opts.calendar.id,
-        orderBy: 'startTime',
-        singleEvents: true,
+        //orderBy: 'startTime',
         timeMin: moment().format(),
         timeMax: moment().add(opts.duration, 'days').format(),
+        maxResults: 1,
         auth: self.jwtClient
       }, (err, response) => {
         if (err) {
@@ -125,4 +126,4 @@ class Almanac {
 
 }
 
-export default Almanac;
+module.exports = Almanac;
