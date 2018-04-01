@@ -19,7 +19,6 @@
     "googleapis": "^28.0.1",
     "lodash": "^4.17.5",
     "md5": "^2.2.1",
-    "moment": "^2.21.0",
     "native-promise-only": "^0.7.6-a",
     "react-gravatar": "^1.0.0",
     "superagent": "1.8.3",

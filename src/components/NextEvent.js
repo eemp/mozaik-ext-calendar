@@ -1,24 +1,11 @@
 import _ from 'lodash';
 import md5 from 'md5';
-import moment from 'moment';
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import CalendarIcon from 'react-icons/lib/fa/calendar'
-import { TrapApiError, Widget, WidgetHeader, WidgetBody } from '@mozaik/ui';
+import { Widget, WidgetHeader, WidgetBody } from '@mozaik/ui';
 
 import './Calendar.css';
-
-function formatEventTimerange(event) {
-  var start, end, now, diff;
-  start = moment(event.start);
-  end = moment(event.end);
-  now = moment();
-  diff = start.diff(now);
-  if (diff < 0) {
-    return `Ends ${end.fromNow()}`;
-  } else {
-    return `${start.calendar()} - ${end.format('LT')}`;
-  }
-};
 
 class NextEvent extends Component {
 
